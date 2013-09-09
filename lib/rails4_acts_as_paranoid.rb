@@ -210,8 +210,11 @@ module ActsAsParanoid
     end
 
     def delete_all(conditions = nil)
-      columns = secondary_paranoid_columns.push(primary_paranoid_column)
-
+      if secondary_paranoid_columns.select{|v| v[:column] == primary_paranoid_column[:column]}.size == 0
+        columns = secondary_paranoid_columns.push(primary_paranoid_column)
+      else
+        columns = secondary_paranoid_columns
+      end
       sql = columns.map do |column|
         "#{column[:column]} = ?"
       end.join(", ")
